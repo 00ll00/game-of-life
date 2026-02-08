@@ -1,0 +1,13 @@
+.{
+    .name = .game_of_life,
+    .version = "0.0.1",
+    .minimum_zig_version = "0.15.1",
+    .paths = .{""},
+    .fingerprint = 0x2937c9e2287982b9,
+    .dependencies = .{
+        .dvui = .{
+            .url = "git+https://github.com/david-vanderson/dvui?ref=main#c8759e66e0a6081dc67381bd7e5615da25c8aed4",
+            .hash = "dvui-0.4.0-dev-AQFJmY372gCzFnHrszjjIoYJW7wSYjmAr8CCWy562PDj",
+        },
+    },
+}
