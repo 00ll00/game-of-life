@@ -105,6 +105,7 @@ const GridView = struct {
     var origin: dvui.Point = .{};
     var scroll_info: dvui.ScrollInfo = .{ .vertical = .given, .horizontal = .given };
     var view_region: gol.Rect = undefined;
+    var mouse_point: gol.Vec2 = .init(0, 0);
 
     pub fn draw(gpa: Allocator, world: gol.World) !void {
         _ = gpa;
@@ -135,6 +136,9 @@ const GridView = struct {
 
             switch (e.evt) {
                 .mouse => |me| {
+                    const p = rect_scale_grid.pointFromPhysical(me.p);
+                    mouse_point = gol.Vec2.init(@intFromFloat(p.x), @intFromFloat(p.y));
+
                     if (me.action == .press and me.button == .right) {
                         e.handle(@src(), scroll_container.data());
                         dvui.captureMouse(scroll_container.data(), e.num);
@@ -164,12 +168,10 @@ const GridView = struct {
                             zoomP = me.p;
                         }
                     } else if (me.action == .release and me.button == .left) {
-                        const p = rect_scale_grid.pointFromPhysical(me.p);
-                        const pos = gol.Vec2.init(@intFromFloat(p.x), @intFromFloat(p.y));
-                        if (world.queryCell(pos)) {
-                            _ = world.killCell(pos);
+                        if (world.queryCell(mouse_point)) {
+                            _ = world.killCell(mouse_point);
                         } else {
-                            _ = try world.addCell(pos);
+                            _ = try world.addCell(mouse_point);
                         }
                     }
                 },
@@ -237,6 +239,7 @@ const GridView = struct {
 
         if (scale >= 10) try drawGrid(scaler);
         try drawCells(world, scaler);
+        if (scale >= 10) try drawCursor(scaler);
     }
 
     fn calcViewRect() gol.Rect {
@@ -285,5 +288,16 @@ const GridView = struct {
 
         const view_rect = calcViewRect();
         try world.queryCells(view_rect, helper.drawCell);
+    }
+
+    fn drawCursor(scaler: *dvui.ScaleWidget) !void {
+        const rect_scale = scaler.screenRectScale(.{});
+        dvui.Path.stroke(.{ .points = &.{
+            rect_scale.pointToPhysical(.{ .x = @floatFromInt(mouse_point.x), .y = @floatFromInt(mouse_point.y) }),
+            rect_scale.pointToPhysical(.{ .x = @floatFromInt(mouse_point.x + 1), .y = @floatFromInt(mouse_point.y) }),
+            rect_scale.pointToPhysical(.{ .x = @floatFromInt(mouse_point.x + 1), .y = @floatFromInt(mouse_point.y + 1) }),
+            rect_scale.pointToPhysical(.{ .x = @floatFromInt(mouse_point.x), .y = @floatFromInt(mouse_point.y + 1) }),
+            rect_scale.pointToPhysical(.{ .x = @floatFromInt(mouse_point.x), .y = @floatFromInt(mouse_point.y) }),
+        } }, .{ .thickness = 2, .color = dvui.themeGet().highlight.border orelse .cyan });
     }
 };
