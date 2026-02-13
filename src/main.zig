@@ -141,7 +141,7 @@ const GridView = struct {
             switch (e.evt) {
                 .mouse => |me| {
                     const p = rect_scale_grid.pointFromPhysical(me.p);
-                    mouse_point = gol.Vec2.init(@intFromFloat(p.x), @intFromFloat(p.y));
+                    mouse_point = gol.Vec2.init(@intFromFloat(@floor(p.x)), @intFromFloat(@floor(p.y)));
 
                     if (me.action == .press and me.button == .right) {
                         e.handle(@src(), scroll_container.data());
