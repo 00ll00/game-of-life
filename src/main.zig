@@ -61,7 +61,11 @@ const OptionView = struct {
     var update_rate: f32 = 5;
     pub fn draw(gpa: Allocator, world: gol.World) !void {
         _ = gpa;
-        const box = dvui.box(@src(), .{ .dir = .vertical }, .{});
+        const box = dvui.box(
+            @src(),
+            .{ .dir = .vertical },
+            .{ .expand = .horizontal, .style = .content, .color_fill = dvui.themeGet().fill.lerp(.black, 0.2), .background = true },
+        );
         defer box.deinit();
         {
             const box1 = dvui.box(@src(), .{ .dir = .horizontal }, .{});
