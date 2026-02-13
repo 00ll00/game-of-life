@@ -11,6 +11,7 @@ pub const dvui_app: dvui.App = .{
         .size = .{ .w = 800, .h = 500 },
         .title = "game of life",
         .min_size = .{ .w = 300, .h = 300 },
+        .icon = @embedFile("icon.png"),
     } },
     .frameFn = update,
     .initFn = init,
